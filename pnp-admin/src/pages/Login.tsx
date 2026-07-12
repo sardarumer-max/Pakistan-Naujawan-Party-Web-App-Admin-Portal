@@ -113,8 +113,9 @@ export function Login() {
 
         <div className="login-footer">
           <div>Only admins and moderators can access this dashboard.</div>
-          <div style={{ marginTop: 8, fontSize: 11, color: 'var(--moss)', fontWeight: 500 }}>
-            Super Admin: <b>admin@pnp.org.pk</b> / <b>admin</b>
+          <div style={{ marginTop: 8, fontSize: 11, color: 'var(--moss)', fontWeight: 500, display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
+            <div>Super Admin: <b>admin@pnp.org.pk</b> / <b>admin</b></div>
+            <div>Dr. Waqar Bin Saif (Leadership): <b>drwaqar@pnp.org.pk</b> / <b>DrWaqar@PNP2024!</b></div>
           </div>
         </div>
       </motion.div>

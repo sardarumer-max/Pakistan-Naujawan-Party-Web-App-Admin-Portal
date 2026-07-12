@@ -25,7 +25,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onClose }: SidebarProps) {
-  const { signOut, profile } = useAuth();
+  const { signOut, profile, isLeader } = useAuth();
   const { data: stats } = useDashboardStats();
 
   const getCount = (id: string) => {
@@ -117,12 +117,16 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <div className="sb-label">AI Cost Monitor</div>
           </NavLink>
 
-          <div className="sb-section">Leadership</div>
-          <NavLink to="/leadership" className={({ isActive }) => `sb-item ${isActive ? 'active' : ''}`} onClick={onClose}>
-            <div className="sb-icon"><Crown size={16} /></div>
-            <div className="sb-label">Dr. Waqar Panel</div>
-            <span className="sb-badge-green">PRIVATE</span>
-          </NavLink>
+          {isLeader && (
+            <>
+              <div className="sb-section">Leadership</div>
+              <NavLink to="/leadership" className={({ isActive }) => `sb-item ${isActive ? 'active' : ''}`} onClick={onClose}>
+                <div className="sb-icon"><Crown size={16} /></div>
+                <div className="sb-label">Dr. Waqar Panel</div>
+                <span className="sb-badge-green">PRIVATE</span>
+              </NavLink>
+            </>
+          )}
 
           <div className="sb-section">System</div>
           <NavLink to="/settings" className={({ isActive }) => `sb-item ${isActive ? 'active' : ''}`} onClick={onClose}>

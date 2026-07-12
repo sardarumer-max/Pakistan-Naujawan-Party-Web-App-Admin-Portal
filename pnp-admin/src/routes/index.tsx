@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from '../layouts/AppLayout';
 import { ProtectedRoute } from '../components/ProtectedRoute';
+import { LeaderRoute } from '../components/LeaderRoute';
 import { Login } from '../pages/Login';
 import { Dashboard } from '../pages/Dashboard';
 import { Users } from '../pages/Users';
@@ -40,7 +41,6 @@ export const router = createBrowserRouter([
           { path: 'moderation', element: <Moderation /> },
           { path: 'ai', element: <AIPrompts /> },
           { path: 'costs', element: <AICosts /> },
-          { path: 'leadership', element: <Leadership /> },
           { path: 'admins', element: <Admins /> },
           { path: 'notifications', element: <Notifications /> },
           { path: 'settings', element: <Settings /> },
@@ -58,8 +58,17 @@ export const router = createBrowserRouter([
           { path: 'business', element: <BusinessPage /> },
           { path: 'tv', element: <TVPage /> },
           { path: 'transparency', element: <TransparencyPage /> },
+          /* Leadership — guarded to Dr. Waqar only */
+          {
+            path: 'leadership',
+            element: <LeaderRoute />,
+            children: [
+              { index: true, element: <Leadership /> },
+            ],
+          },
         ],
       },
     ],
   },
 ]);
+
