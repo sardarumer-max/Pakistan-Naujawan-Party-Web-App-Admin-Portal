@@ -1,0 +1,489 @@
+import React, { useState, useMemo } from "react";
+
+/* ---------------- Module registry ---------------- */
+const groups = [
+  { label: "Overview", items: [
+    { id: "dashboard", name: "Dashboard", tag: "DB", color: "#2f6b4f" },
+    { id: "users", name: "Users", tag: "US", color: "#2f6b4f" },
+    { id: "admins", name: "Admins", tag: "AD", color: "#2f6b4f" },
+    { id: "notifications", name: "Notifications", tag: "NT", color: "#2f6b4f" },
+  ]},
+  { label: "Programs", items: [
+    { id: "saathi", name: "PNP Saathi", tag: "SA", color: "#c9932c", desc: "Peer-support helpline requests from citizens paired with a Saathi volunteer.",
+      cols: ["ID","Citizen","City","Topic","Assigned Saathi","Status"],
+      rows: [
+        ["SA-1042","Ayesha Raheel","Lahore","Exam stress","Bilal Khan","open"],
+        ["SA-1041","Usman Tariq","Multan","Job anxiety","Sana Malik","resolved"],
+        ["SA-1039","Hira Zafar","Karachi","Family conflict","Bilal Khan","pending"],
+        ["SA-1037","Fahad Iqbal","Peshawar","Loneliness","Zara Sheikh","resolved"],
+        ["SA-1035","Mehak Noor","Quetta","Career choice","Sana Malik","open"],
+      ]},
+    { id: "rozgar", name: "Rozgar", tag: "RZ", color: "#c9932c", desc: "Job listings and applications posted through the Rozgar employment portal.",
+      cols: ["ID","Position","Employer","City","Applicants","Status"],
+      rows: [
+        ["RZ-3301","Data Entry Operator","Al-Noor Traders","Faisalabad","24","open"],
+        ["RZ-3298","Tailor (Male/Female)","Sitara Textiles","Lahore","11","open"],
+        ["RZ-3290","Delivery Rider","QuickCart","Karachi","57","closed"],
+        ["RZ-3287","Junior Accountant","Meezan Traders","Islamabad","19","review"],
+        ["RZ-3281","School Teacher","Iqra Public School","Multan","8","open"],
+        ["RZ-3277","Electrician","Bright Homes","Rawalpindi","14","closed"],
+      ]},
+    { id: "problems", name: "Pakistan Problems", tag: "PP", color: "#a8452f", desc: "Civic complaints submitted by citizens, routed to the relevant department.",
+      cols: ["ID","Issue","Location","Category","Reported by","Status"],
+      rows: [
+        ["PP-8891","Broken streetlights","G-9, Islamabad","Infrastructure","M. Aslam","open"],
+        ["PP-8887","Overflowing drain","Korangi, Karachi","Sanitation","Rubina Bibi","pending"],
+        ["PP-8880","Illegal encroachment","Model Town, Lahore","Municipal","Anonymous","review"],
+        ["PP-8874","Water shortage","Latifabad, Hyderabad","Utilities","Junaid Soomro","resolved"],
+        ["PP-8869","Unpaved road","Cantt, Multan","Infrastructure","Kashif Butt","open"],
+      ]},
+    { id: "voice", name: "Naujawan Voice", tag: "NV", color: "#c9932c", desc: "Policy ideas and opinions submitted by young citizens for review.",
+      cols: ["ID","Title","Author","Category","Votes","Status"],
+      rows: [
+        ["NV-514","Free WiFi in public parks","Zoya Ahmed","Digital access","312","review"],
+        ["NV-509","Youth card for bus fares","Hamza Riaz","Transport","208","approved"],
+        ["NV-503","Night market safety patrols","Komal Yousuf","Safety","145","open"],
+        ["NV-498","Skill fairs in tehsils","Ibrahim Chaudhry","Education","97","approved"],
+      ]},
+    { id: "skill", name: "Skill Pakistan", tag: "SK", color: "#c9932c", desc: "Free and subsidised courses run through the Skill Pakistan initiative.",
+      cols: ["ID","Course","Instructor","Seats","Enrolled","Status"],
+      rows: [
+        ["SK-201","Freelance Graphic Design","Nida Aziz","40","38","open"],
+        ["SK-198","Basic Electrical Wiring","Rashid Mehmood","25","25","closed"],
+        ["SK-194","Spoken English","Farah Yousaf","60","41","open"],
+        ["SK-190","Mobile Repair Basics","Adeel Anjum","30","22","open"],
+        ["SK-186","Digital Marketing 101","Nida Aziz","50","50","closed"],
+      ]},
+    { id: "kisaan", name: "Kisaan Portal", tag: "KP", color: "#2f6b4f", desc: "Advisory requests and market listings submitted by farmers.",
+      cols: ["ID","Farmer","District","Crop","Query","Status"],
+      rows: [
+        ["KP-772","Ghulam Rasool","Sahiwal","Wheat","Fertiliser advice","resolved"],
+        ["KP-769","Nazia Parveen","Bahawalpur","Cotton","Pest outbreak","open"],
+        ["KP-765","Sher Ali","Muzaffargarh","Sugarcane","Water quota","pending"],
+        ["KP-760","Iqbal Hussain","Okara","Rice","Fair market price","resolved"],
+      ]},
+    { id: "mahfooz", name: "Mahfooz", tag: "MF", color: "#a8452f", desc: "Safety and harassment reports submitted through the Mahfooz protection line.",
+      cols: ["ID","Reporter","City","Category","Priority","Status"],
+      rows: [
+        ["MF-330","Anonymous","Karachi","Workplace harassment","High","open"],
+        ["MF-327","Anonymous","Lahore","Online abuse","Medium","review"],
+        ["MF-321","Sadia Kamal","Sialkot","Street harassment","High","resolved"],
+        ["MF-315","Anonymous","Peshawar","Domestic safety","High","open"],
+      ]},
+    { id: "qaanoon", name: "Qaanoon", tag: "QN", color: "#2f6b4f", desc: "Free legal guidance requests answered by volunteer advocates.",
+      cols: ["ID","Citizen","Topic","Advocate","City","Status"],
+      rows: [
+        ["QN-441","Tariq Javed","Tenancy dispute","Adv. Saima Riaz","Lahore","resolved"],
+        ["QN-438","Nasreen Akhtar","Inheritance","Adv. Bilal Farooq","Karachi","open"],
+        ["QN-433","Waqar Younis","Labour rights","Adv. Saima Riaz","Faisalabad","pending"],
+      ]},
+    { id: "emergency", name: "Emergency Network", tag: "EN", color: "#a8452f", desc: "Live alerts broadcast to the volunteer emergency response network.",
+      cols: ["ID","Alert","Location","Responders","Dispatched","Status"],
+      rows: [
+        ["EN-092","House fire","Nazimabad, Karachi","6","6","closed"],
+        ["EN-091","Flood warning","Kot Addu","14","10","open"],
+        ["EN-089","Road accident","Ferozepur Rd, Lahore","4","4","closed"],
+        ["EN-087","Building collapse risk","Saddar, Rawalpindi","8","5","review"],
+      ]},
+    { id: "business", name: "Youth Business Hub", tag: "YB", color: "#c9932c", desc: "Small businesses and startups registered for mentorship and microloans.",
+      cols: ["ID","Business","Founder","Sector","City","Status"],
+      rows: [
+        ["YB-160","Chai Point Cart","Danish Malik","Food","Lahore","approved"],
+        ["YB-157","StitchWorks","Ayesha Farooq","Apparel","Karachi","review"],
+        ["YB-153","GreenLeaf Produce","Bilal Ahsan","Agri-trade","Multan","approved"],
+        ["YB-149","PixelCraft Studio","Hamna Tariq","Design","Islamabad","open"],
+      ]},
+    { id: "tv", name: "Naujawan TV", tag: "TV", color: "#c9932c", desc: "Video content pending review before publishing to the Naujawan TV channel.",
+      cols: ["ID","Title","Creator","Category","Views","Status"],
+      rows: [
+        ["TV-905","How to file a CNIC correction","Ali Hamza","Explainer","12,400","open"],
+        ["TV-902","Interview: young farmer entrepreneurs","Mariam Sohail","Interview","8,120","review"],
+        ["TV-897","Budget 101 for first jobs","Danyal Aziz","Education","21,050","open"],
+        ["TV-891","Street voices: Karachi transport","Mariam Sohail","Documentary","5,430","pending"],
+      ]},
+    { id: "transparency", name: "Transparency Hub", tag: "TH", color: "#2f6b4f", desc: "Donations and public fund disbursements published for audit.",
+      cols: ["ID","Donor / Fund","Purpose","Amount (PKR)","District","Status"],
+      rows: [
+        ["TH-220","Anonymous donor","Flood relief","500,000","Kot Addu","resolved"],
+        ["TH-217","PNP Community Fund","School supplies","180,000","Muzaffargarh","open"],
+        ["TH-212","Corporate CSR — Zafar Textiles","Winter blankets","350,000","Quetta","review"],
+        ["TH-208","Anonymous donor","Medical camp","240,000","Larkana","resolved"],
+      ]},
+  ]},
+  { label: "System", items: [
+    { id: "settings", name: "Settings", tag: "ST", color: "#12253a" },
+  ]},
+];
+
+// flatten for lookup
+const moduleMap = {};
+groups.forEach(g => g.items.forEach(m => (moduleMap[m.id] = m)));
+
+/* ---------------- Static data for overview + built-ins ---------------- */
+const overviewCards = [
+  { k: "Users", v: "1,250", d: "+38 this week", color: "#2f6b4f" },
+  { k: "Jobs (Rozgar)", v: "340", d: "+12 this week", color: "#c9932c" },
+  { k: "Complaints", v: "52", d: "9 unresolved", color: "#a8452f", down: true },
+  { k: "Voice ideas", v: "81", d: "+6 this week", color: "#c9932c" },
+  { k: "Courses", v: "18", d: "3 closing soon", color: "#2f6b4f" },
+  { k: "Businesses", v: "45", d: "+4 this week", color: "#c9932c" },
+  { k: "Videos", v: "62", d: "5 in review", color: "#c9932c" },
+  { k: "Donations", v: "₨2.1M", d: "this quarter", color: "#2f6b4f" },
+];
+
+const usersData = { cols: ["ID","Name","City","Programs used","Joined","Status"], rows: [
+  ["U-2201","Ayesha Raheel","Lahore","Saathi, Voice","Mar 2025","active"],
+  ["U-2198","Usman Tariq","Multan","Saathi","Feb 2025","active"],
+  ["U-2190","Rubina Bibi","Karachi","Pakistan Problems","Jan 2025","active"],
+  ["U-2184","Ghulam Rasool","Sahiwal","Kisaan Portal","Dec 2024","active"],
+  ["U-2177","Danish Malik","Lahore","Business Hub","Nov 2024","suspended"],
+  ["U-2169","Nazia Parveen","Bahawalpur","Kisaan Portal","Nov 2024","active"],
+]};
+
+const adminsData = { cols: ["ID","Name","Role","Manages","Last active","Status"], rows: [
+  ["1","Super Admin","Owner","All modules","Just now","active"],
+  ["2","Bilal Khan","Saathi Lead","PNP Saathi","2h ago","active"],
+  ["3","Sana Malik","Program Manager","Rozgar, Skill Pakistan","1d ago","active"],
+  ["4","Adv. Saima Riaz","Legal Lead","Qaanoon","3d ago","active"],
+  ["5","Zara Sheikh","Moderator","Naujawan Voice, TV","5d ago","suspended"],
+]};
+
+const notifData = { cols: ["ID","Message","Module","Sent","Status"], rows: [
+  ["N-441","3 new complaints need triage","Pakistan Problems","10 min ago","open"],
+  ["N-440","Course seats full: Digital Marketing 101","Skill Pakistan","1h ago","closed"],
+  ["N-439","High priority safety report filed","Mahfooz","2h ago","open"],
+  ["N-438","Flood warning acknowledged by 10 responders","Emergency Network","4h ago","resolved"],
+  ["N-437","New donation pledge recorded","Transparency Hub","1d ago","closed"],
+]};
+
+/* ---------------- Small presentational helpers ---------------- */
+function Pill({ status }) {
+  return <span className={`pill ${status}`}>{status}</span>;
+}
+
+function DataTable({ cols, rows, emptyLabel, query }) {
+  const q = (query || "").trim().toLowerCase();
+  const visibleRows = q
+    ? rows.filter(r => r.join(" ").toLowerCase().includes(q))
+    : rows;
+
+  if (!rows.length) {
+    return (
+      <table>
+        <tbody>
+          <tr className="empty-row">
+            <td colSpan={cols.length + 1}>No records yet — {emptyLabel || "nothing to show here."}</td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  }
+
+  return (
+    <table>
+      <thead>
+        <tr>
+          {cols.map(c => <th key={c}>{c}</th>)}
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {visibleRows.length === 0 ? (
+          <tr className="empty-row">
+            <td colSpan={cols.length + 1}>No rows match your search.</td>
+          </tr>
+        ) : (
+          visibleRows.map((r, ri) => (
+            <tr key={ri}>
+              {r.map((cell, i) => {
+                const isStatusCol = i === r.length - 1 && /^(active|suspended|open|closed|pending|review|approved|rejected|resolved)$/.test(cell);
+                return <td key={i}>{isStatusCol ? <Pill status={cell} /> : cell}</td>;
+              })}
+              <td className="row-actions">
+                <button>View</button>
+                <button>Edit</button>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+function PageShell({ title, desc, data, actionLabel, color, tag, query, crumb }) {
+  return (
+    <>
+      <div className="crumb">{crumb}</div>
+      <div className="page-head">
+        <div>
+          <h1>{tag ? <span style={{ color }}>{tag}</span> : null}{tag ? " · " : ""}{title}</h1>
+          <p>{desc || ""}</p>
+        </div>
+        <button className="primary-btn">{actionLabel || "Add new"}</button>
+      </div>
+      <div className="panel">
+        <div className="panel-head">
+          <h3>{title} records</h3>
+          <span className="n">{data.rows.length} total</span>
+        </div>
+        <DataTable cols={data.cols} rows={data.rows} emptyLabel={`no entries submitted for ${title} yet.`} query={query} />
+      </div>
+    </>
+  );
+}
+
+/* ---------------- Main App ---------------- */
+export default function PnpAdmin() {
+  const [currentModule, setCurrentModule] = useState("dashboard");
+  const [query, setQuery] = useState("");
+  const [sideOpen, setSideOpen] = useState(false);
+
+  const m = moduleMap[currentModule];
+  const crumbFor = (name) => groups.find(g => g.items.some(i => i.name === name))?.label || "";
+
+  const goTo = (id) => {
+    setCurrentModule(id);
+    setSideOpen(false);
+    setQuery("");
+  };
+
+  const renderContent = useMemo(() => {
+    if (currentModule === "dashboard") {
+      return (
+        <>
+          <div className="crumb">Overview</div>
+          <div className="page-head">
+            <div>
+              <h1>Dashboard</h1>
+              <p>Snapshot across all sixteen PNP programs, updated live as citizens submit requests.</p>
+            </div>
+            <button className="primary-btn">Export summary</button>
+          </div>
+          <div className="cards">
+            {overviewCards.map((c, i) => (
+              <div className="card" key={i}>
+                <div className="k"><span className="sw" style={{ background: c.color }}></span>{c.k}</div>
+                <div className="v">{c.v}</div>
+                <div className={`d ${c.down ? "down" : ""}`}>{c.d}</div>
+              </div>
+            ))}
+          </div>
+          <div className="panel">
+            <div className="panel-head"><h3>Recent activity</h3><span className="n">last 24 hours</span></div>
+            <DataTable cols={notifData.cols} rows={notifData.rows} query={query} />
+          </div>
+        </>
+      );
+    }
+
+    if (currentModule === "users") {
+      return <PageShell title="Users" desc="People registered across the PNP platform." data={usersData} query={query} crumb={crumbFor("Users")} />;
+    }
+    if (currentModule === "admins") {
+      return <PageShell title="Admins" desc="Staff and program leads with panel access." data={adminsData} actionLabel="Invite admin" query={query} crumb={crumbFor("Admins")} />;
+    }
+    if (currentModule === "notifications") {
+      return <PageShell title="Notifications" desc="System alerts routed to the admin team." data={notifData} query={query} crumb={crumbFor("Notifications")} />;
+    }
+    if (currentModule === "settings") {
+      return (
+        <>
+          <div className="crumb">System</div>
+          <div className="page-head"><div><h1>Settings</h1><p>Prototype only — nothing here is saved.</p></div></div>
+          <div className="panel">
+            <div className="form-grid">
+              <div className="field"><label>Platform name</label><input defaultValue="Pakistan Naujawan Program" /></div>
+              <div className="field"><label>Support email</label><input defaultValue="admin@pnp.org.pk" /></div>
+              <div className="field"><label>Default language</label><select><option>English</option><option>Urdu</option></select></div>
+              <div className="field"><label>Time zone</label><select><option>PKT (UTC+5)</option></select></div>
+            </div>
+            <div style={{ padding: "0 20px 20px" }}>
+              <button className="primary-btn">Save changes</button>{" "}
+              <button className="ghost-btn">Cancel</button>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    // program module with data
+    return (
+      <PageShell
+        title={m.name}
+        desc={m.desc}
+        data={{ cols: m.cols, rows: m.rows }}
+        color={m.color}
+        tag={m.tag}
+        query={query}
+        crumb={crumbFor(m.name)}
+      />
+    );
+  }, [currentModule, query]);
+
+  return (
+    <div className="pnp-root">
+      <style>{css}</style>
+      <div className="app">
+        <aside className={`side ${sideOpen ? "show" : ""}`}>
+          <div className="side-head">
+            <div className="brand"><span className="mark">PN</span> PNP Admin</div>
+            <div className="sub">Control Room</div>
+          </div>
+          <nav className="nav-scroll">
+            {groups.map(g => (
+              <React.Fragment key={g.label}>
+                <div className="nav-label">{g.label}</div>
+                {g.items.map(item => (
+                  <div
+                    key={item.id}
+                    className={`nav-item ${item.id === currentModule ? "active" : ""}`}
+                    onClick={() => goTo(item.id)}
+                  >
+                    <span className="dot" style={{ background: item.color }}>{item.tag}</span>
+                    <span>{item.name}</span>
+                    {item.rows ? <span className="count">{item.rows.length}</span> : null}
+                  </div>
+                ))}
+              </React.Fragment>
+            ))}
+          </nav>
+          <div className="side-foot">v0.9 prototype · not for production</div>
+        </aside>
+
+        <div className={`overlay ${sideOpen ? "show" : ""}`} onClick={() => setSideOpen(false)}></div>
+
+        <div className="main">
+          <div className="topbar">
+            <button className="menu-btn" onClick={() => setSideOpen(true)}>&#9776;</button>
+            <div className="search-box">
+              <input
+                placeholder="Search this table…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
+            <div className="topbar-right">
+              <button className="badge-btn">&#128276;<span className="pip">6</span></button>
+              <div className="who">
+                <div className="av">SA</div>
+                <div className="meta"><b>Super Admin</b><span>Owner access</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="content">{renderContent}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const css = `
+.pnp-root{
+  --ink:#12253a;
+  --ink-2:#1a3350;
+  --paper:#f6f3ec;
+  --paper-2:#ffffff;
+  --moss:#2f6b4f;
+  --moss-dark:#234f3a;
+  --gold:#c9932c;
+  --clay:#a8452f;
+  --line:#e2ddce;
+  --text:#26241f;
+  --text-dim:#6b6a63;
+  font-family:'Inter',sans-serif;
+  color:var(--text);
+  background:var(--paper);
+}
+.pnp-root *{box-sizing:border-box}
+.pnp-root h1,.pnp-root h2,.pnp-root h3,.pnp-root .brand{font-family:'Fraunces',serif}
+.pnp-root .mono{font-family:'IBM Plex Mono',monospace}
+
+.pnp-root .app{display:flex;min-height:100vh}
+
+.pnp-root .side{width:264px;flex-shrink:0;background:var(--ink);color:#dfe6ee;min-height:100vh;position:sticky;top:0;display:flex;flex-direction:column;transition:transform .3s ease}
+.pnp-root .side-head{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.pnp-root .side-head .brand{font-size:21px;font-weight:600;color:#fff;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+.pnp-root .brand .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--moss),var(--gold));display:inline-flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;color:#0d1a29;font-size:15px}
+.pnp-root .side-head .sub{font-size:11.5px;color:#93a4b8;margin-top:5px;letter-spacing:.4px;text-transform:uppercase}
+
+.pnp-root .nav-scroll{overflow-y:auto;flex:1;padding:14px 10px 20px}
+.pnp-root .nav-label{font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:#6d7f95;padding:16px 12px 6px}
+.pnp-root .nav-label:first-child{padding-top:6px}
+.pnp-root .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:#c9d3e0;text-decoration:none;font-size:14px;cursor:pointer;margin-bottom:2px;border:1px solid transparent}
+.pnp-root .nav-item .dot{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'IBM Plex Mono',monospace;flex-shrink:0;color:#0d1a29}
+.pnp-root .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.pnp-root .nav-item.active{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.12)}
+.pnp-root .nav-item .count{margin-left:auto;font-size:11px;color:#8fa0b4;font-family:'IBM Plex Mono',monospace}
+
+.pnp-root .side-foot{padding:14px 20px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#7d8ea3}
+
+.pnp-root .main{flex:1;min-width:0}
+.pnp-root .topbar{position:sticky;top:0;z-index:5;background:rgba(246,243,236,.9);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:14px 26px;display:flex;align-items:center;gap:16px}
+.pnp-root .menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:8px;width:36px;height:36px;font-size:18px;cursor:pointer;color:var(--ink)}
+.pnp-root .search-box{flex:1;max-width:380px;position:relative}
+.pnp-root .search-box input{width:100%;padding:9px 12px 9px 34px;border-radius:9px;border:1px solid var(--line);background:var(--paper-2);font-size:13.5px;font-family:'Inter',sans-serif}
+.pnp-root .search-box input:focus{outline:2px solid var(--moss);outline-offset:1px}
+.pnp-root .search-box::before{content:"⌕";position:absolute;left:11px;top:6px;color:var(--text-dim);font-size:16px}
+.pnp-root .topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.pnp-root .badge-btn{position:relative;background:none;border:1px solid var(--line);border-radius:9px;width:36px;height:36px;cursor:pointer;font-size:15px;color:var(--ink)}
+.pnp-root .badge-btn .pip{position:absolute;top:-4px;right:-4px;background:var(--clay);color:#fff;font-size:9.5px;border-radius:9px;padding:1px 4px;font-family:'IBM Plex Mono',monospace}
+.pnp-root .who{display:flex;align-items:center;gap:9px}
+.pnp-root .who .av{width:34px;height:34px;border-radius:50%;background:var(--moss);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+.pnp-root .who .meta{line-height:1.25}
+.pnp-root .who .meta b{font-size:13px;display:block}
+.pnp-root .who .meta span{font-size:11.5px;color:var(--text-dim)}
+
+.pnp-root .content{padding:24px 26px 60px}
+.pnp-root .crumb{font-size:12px;color:var(--text-dim);margin-bottom:6px;letter-spacing:.3px}
+.pnp-root .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.pnp-root .page-head h1{font-size:26px;margin:0 0 4px;color:var(--ink);font-weight:600}
+.pnp-root .page-head p{margin:0;color:var(--text-dim);font-size:13.5px;max-width:560px}
+.pnp-root .primary-btn{background:var(--moss);color:#fff;border:none;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.pnp-root .primary-btn:hover{background:var(--moss-dark)}
+.pnp-root .ghost-btn{background:none;border:1px solid var(--line);padding:9px 14px;border-radius:9px;font-size:13px;cursor:pointer;color:var(--ink)}
+
+.pnp-root .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:26px}
+.pnp-root .card{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.pnp-root .card .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);display:flex;align-items:center;gap:7px}
+.pnp-root .card .k .sw{width:8px;height:8px;border-radius:2px}
+.pnp-root .card .v{font-family:'Fraunces',serif;font-size:29px;font-weight:600;margin-top:6px;color:var(--ink)}
+.pnp-root .card .d{font-size:12px;color:var(--moss-dark);margin-top:3px}
+.pnp-root .card .d.down{color:var(--clay)}
+
+.pnp-root .panel{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pnp-root .panel-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.pnp-root .panel-head h3{margin:0;font-size:15px;font-weight:600;color:var(--ink)}
+.pnp-root .panel-head .n{margin-left:auto;font-size:12px;color:var(--text-dim);font-family:'IBM Plex Mono',monospace}
+.pnp-root table{width:100%;border-collapse:collapse;font-size:13.5px}
+.pnp-root thead th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);padding:10px 18px;border-bottom:1px solid var(--line);white-space:nowrap}
+.pnp-root tbody td{padding:11px 18px;border-bottom:1px solid var(--line);color:var(--text)}
+.pnp-root tbody tr:last-child td{border-bottom:none}
+.pnp-root tbody tr:hover{background:#fbfaf6}
+.pnp-root .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+.pnp-root .pill.active,.pnp-root .pill.approved,.pnp-root .pill.resolved,.pnp-root .pill.open{background:#e4f1e8;color:var(--moss-dark)}
+.pnp-root .pill.pending,.pnp-root .pill.review{background:#fbf0dc;color:#8a621b}
+.pnp-root .pill.suspended,.pnp-root .pill.rejected,.pnp-root .pill.closed{background:#f5e2dd;color:var(--clay)}
+.pnp-root .row-actions{display:flex;gap:6px}
+.pnp-root .row-actions button{background:none;border:1px solid var(--line);border-radius:6px;padding:4px 9px;font-size:11.5px;cursor:pointer;color:var(--ink)}
+.pnp-root .row-actions button:hover{background:var(--paper)}
+.pnp-root .empty-row td{padding:26px 18px;text-align:center;color:var(--text-dim);font-size:13px}
+
+.pnp-root .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px}
+.pnp-root .field{display:flex;flex-direction:column;gap:6px}
+.pnp-root .field label{font-size:12px;color:var(--text-dim);font-weight:600}
+.pnp-root .field input,.pnp-root .field select{padding:9px 11px;border-radius:8px;border:1px solid var(--line);font-size:13.5px;font-family:'Inter',sans-serif}
+@media(max-width:640px){.pnp-root .form-grid{grid-template-columns:1fr}}
+
+.pnp-root .overlay{display:none;position:fixed;inset:0;background:rgba(15,25,40,.4);z-index:8}
+.pnp-root .overlay.show{display:block}
+
+@media(max-width:900px){
+  .pnp-root .side{position:fixed;left:0;top:0;bottom:0;z-index:9;transform:translateX(-100%)}
+  .pnp-root .side.show{transform:translateX(0)}
+  .pnp-root .menu-btn{display:inline-block}
+  .pnp-root .who .meta{display:none}
+  .pnp-root .search-box{max-width:none}
+}
+`;

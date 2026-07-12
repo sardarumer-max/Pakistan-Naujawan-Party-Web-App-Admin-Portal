@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PNP Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #060C09;
+  --surface:  #0C1810;
+  --card:     #111F15;
+  --border:   rgba(1,65,28,0.45);
+  --green:    #01411C;
+  --glow:     #02a846;
+  --accent:   #00FF6A;
+  --gold:     #C8A84B;
+  --gold-hi:  #FFD566;
+  --t1:       #E8EDE9;
+  --t2:       #7A9E80;
+  --t3:       #3A5C40;
+  --red:      #E84040;
+  --warn:     #D69E2E;
+  --blue:     #6366f1;
+  --f:        'Space Grotesk', sans-serif;
+  --fd:       'Bebas Neue', sans-serif;
+  --fu:       'Noto Nastaliq Urdu', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--t1);font-family:var(--f);font-size:12px;height:100vh;display:flex;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:200px;flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  height:100vh;overflow-y:auto;
+  scrollbar-width:none;
+}
+.sidebar::-webkit-scrollbar{display:none;}
+
+.sb-logo{
+  padding:16px 14px 12px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;
+}
+.sb-badge{
+  width:30px;height:30px;background:var(--green);
+  border:1px solid var(--glow);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:12px;color:var(--accent);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  flex-shrink:0;
+}
+.sb-title{display:flex;flex-direction:column;gap:1px;}
+.sb-t1{font-family:var(--fd);font-size:14px;letter-spacing:2px;color:var(--accent);}
+.sb-t2{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);}
+
+.sb-section{padding:10px 10px 4px;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-weight:700;}
+
+.sb-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 12px;cursor:pointer;
+  border-left:2px solid transparent;
+  transition:all 0.15s;
+  margin:1px 6px;
+  border-radius:1px;
+}
+.sb-item:hover{background:rgba(0,255,106,0.04);color:var(--t1);}
+.sb-item.active{background:rgba(0,255,106,0.08);border-left-color:var(--accent);color:var(--accent);}
+.sb-item.active .sb-icon{color:var(--accent);}
+.sb-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+.sb-label{font-size:11px;font-weight:500;flex:1;}
+.sb-badge-count{font-size:8px;background:rgba(232,64,64,0.2);border:1px solid rgba(232,64,64,0.3);color:#F87171;padding:1px 5px;font-weight:700;}
+.sb-badge-green{font-size:8px;background:rgba(0,255,106,0.1);border:1px solid rgba(0,255,106,0.2);color:var(--accent);padding:1px 5px;font-weight:700;}
+
+.sb-user{
+  margin-top:auto;padding:12px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+  flex-shrink:0;
+}
+.sb-av{width:28px;height:28px;background:var(--green);border:1px solid var(--glow);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.sb-name{font-size:11px;font-weight:500;color:var(--t1);}
+.sb-role{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* topbar */
+.topbar{
+  height:48px;flex-shrink:0;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+}
+.tb-left{display:flex;align-items:center;gap:12px;}
+.tb-page{font-family:var(--fd);font-size:16px;letter-spacing:3px;color:var(--t1);}
+.tb-sub{font-size:10px;color:var(--t2);}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-search{background:var(--card);border:1px solid var(--border);padding:6px 12px;display:flex;align-items:center;gap:7px;width:180px;}
+.tb-search input{background:transparent;border:none;outline:none;color:var(--t1);font-family:var(--f);font-size:11px;width:100%;}
+.tb-search input::placeholder{color:var(--t3);}
+.tb-btn{padding:6px 12px;background:var(--accent);color:var(--bg);font-family:var(--f);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));}
+.tb-notif{position:relative;cursor:pointer;font-size:16px;}
+.tb-dot{position:absolute;top:-2px;right:-2px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--surface);}
+
+/* content */
+.content{flex:1;overflow-y:auto;padding:16px 20px;scrollbar-width:thin;scrollbar-color:var(--green) var(--bg);}
+
+/* screens */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ── COMPONENTS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.stat-card{background:var(--card);border:1px solid var(--border);padding:12px 14px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--sc-c,var(--accent));}
+.sc-num{font-family:var(--fd);font-size:28px;letter-spacing:2px;color:var(--t1);line-height:1;}
+.sc-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);margin-top:3px;}
+.sc-change{font-size:10px;margin-top:4px;}
+.sc-up{color:#4DCC74;}
+.sc-dn{color:#F87171;}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+
+.panel{background:var(--card);border:1px solid var(--border);padding:14px;}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.panel-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;display:flex;align-items:center;gap:6px;}
+.panel-title::before{content:'';width:10px;height:1px;background:var(--accent);}
+.panel-action{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--t2);cursor:pointer;border:1px solid var(--border);padding:3px 8px;}
+.panel-action:hover{color:var(--accent);border-color:var(--border);border-color:rgba(0,255,106,0.3);}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--t3);font-weight:700;padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.tbl td{padding:8px 10px;border-bottom:1px solid rgba(1,65,28,0.2);font-size:11px;color:var(--t1);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(0,255,106,0.02);}
+.tbl-ur{font-family:var(--fu);font-size:12px;direction:rtl;text-align:right;}
+
+/* badge variants */
+.b{font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;font-weight:700;display:inline-block;}
+.b-g{background:rgba(0,255,106,0.08);border:1px solid rgba(0,255,106,0.2);color:#4DCC74;}
+.b-r{background:rgba(232,64,64,0.1);border:1px solid rgba(232,64,64,0.25);color:#F87171;}
+.b-y{background:rgba(214,158,46,0.1);border:1px solid rgba(214,158,46,0.25);color:#FCD34D;}
+.b-gold{background:rgba(200,168,75,0.12);border:1px solid rgba(200,168,75,0.3);color:var(--gold-hi);}
+.b-blue{background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);color:#a5b4fc;}
+.b-muted{background:rgba(122,158,128,0.1);border:1px solid rgba(122,158,128,0.2);color:var(--t2);}
+
+/* action buttons in table */
+.act{font-size:8px;padding:3px 8px;border:none;cursor:pointer;font-family:var(--f);font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+.act-g{background:rgba(0,255,106,0.1);border:1px solid rgba(0,255,106,0.2);color:#4DCC74;}
+.act-r{background:rgba(232,64,64,0.1);border:1px solid rgba(232,64,64,0.2);color:#F87171;}
+.act-row{display:flex;gap:4px;}
+
+/* activity feed */
+.feed-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(1,65,28,0.2);}
+.feed-item:last-child{border-bottom:none;}
+.feed-icon{width:28px;height:28px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.feed-text{flex:1;}
+.feed-title{font-size:11px;color:var(--t1);font-weight:500;margin-bottom:2px;}
+.feed-meta{font-size:9px;color:var(--t2);}
+.feed-time{font-size:9px;color:var(--t3);white-space:nowrap;}
+
+/* map placeholder */
+.map-ph{
+  background:var(--surface);border:1px solid var(--border);
+  height:180px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.map-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(1,65,28,0.1) 1px,transparent 1px),linear-gradient(90deg,rgba(1,65,28,0.1) 1px,transparent 1px);background-size:20px 20px;}
+.map-pak{position:absolute;font-size:100px;opacity:0.04;user-select:none;}
+.map-pin{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.mp-dot{width:10px;height:10px;border-radius:50%;border:2px solid;}
+.mp-lbl{font-size:7px;background:rgba(6,12,9,0.9);border:1px solid var(--border);padding:1px 4px;color:var(--t2);white-space:nowrap;}
+.map-legend{position:absolute;bottom:8px;right:8px;background:rgba(6,12,9,0.92);border:1px solid var(--border);padding:7px 9px;display:flex;flex-direction:column;gap:4px;}
+.ml-item{display:flex;align-items:center;gap:5px;font-size:8px;color:var(--t2);}
+.ml-dot{width:6px;height:6px;border-radius:50%;}
+
+/* progress bars */
+.prog{height:3px;background:var(--border);overflow:hidden;margin-top:4px;}
+.prog-fill{height:100%;background:var(--accent);}
+
+/* sentiment bars */
+.sent-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(1,65,28,0.15);}
+.sent-item:last-child{border-bottom:none;}
+.sent-label{width:70px;font-size:10px;color:var(--t2);}
+.sent-bar{flex:1;height:4px;background:var(--border);overflow:hidden;}
+.sent-fill{height:100%;}
+.sent-val{width:28px;text-align:right;font-size:10px;font-weight:600;}
+
+/* mini chart bars */
+.chart-bars{display:flex;align-items:flex-end;gap:3px;height:50px;padding-top:4px;}
+.cb{flex:1;background:rgba(0,255,106,0.15);border-top:1px solid rgba(0,255,106,0.3);min-height:4px;position:relative;}
+.cb:hover{background:rgba(0,255,106,0.25);}
+.cb-lbl{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:7px;color:var(--t3);white-space:nowrap;}
+
+/* ai prompt panel */
+.prompt-box{background:var(--surface);border:1px solid var(--border);padding:10px;font-size:11px;color:var(--t1);line-height:1.7;min-height:80px;border-left:2px solid var(--accent);}
+
+/* toggle */
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(1,65,28,0.2);}
+.toggle:last-child{border-bottom:none;}
+.tog-info{display:flex;flex-direction:column;gap:2px;}
+.tog-name{font-size:11px;color:var(--t1);font-weight:500;}
+.tog-desc{font-size:9px;color:var(--t2);}
+.tog-sw{width:32px;height:17px;background:var(--green);border:1px solid var(--glow);border-radius:8px;position:relative;cursor:pointer;}
+.tog-sw::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:var(--accent);border-radius:50%;transition:left 0.2s;}
+.tog-sw.off{background:var(--card);border-color:var(--border);}
+.tog-sw.off::after{background:var(--t3);left:auto;right:2px;}
+
+/* user row */
+.user-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(1,65,28,0.2);}
+.user-row:last-child{border-bottom:none;}
+.u-av{width:26px;height:26px;background:var(--green);border:1px solid var(--glow);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.u-info{flex:1;}
+.u-name{font-size:11px;color:var(--t1);font-weight:500;}
+.u-meta{font-size:9px;color:var(--t2);}
+
+/* cost bars */
+.cost-item{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(1,65,28,0.15);}
+.cost-item:last-child{border-bottom:none;}
+.cost-portal{width:80px;font-size:10px;color:var(--t2);}
+.cost-bar{flex:1;height:4px;background:var(--border);overflow:hidden;}
+.cost-fill{height:100%;background:var(--accent);}
+.cost-val{width:40px;text-align:right;font-size:10px;font-weight:600;color:var(--t1);}
+
+/* divider */
+.gap{height:12px;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-badge">PNP</div>
+    <div class="sb-title">
+      <div class="sb-t1">ADMIN</div>
+      <div class="sb-t2">Pakistan Naujawan Party</div>
+    </div>
+  </div>
+
+  <div class="sb-section">Overview</div>
+  <div class="sb-item active" onclick="show('home',this)"><div class="sb-icon">🏠</div><div class="sb-label">Dashboard</div></div>
+  <div class="sb-item" onclick="show('analytics',this)"><div class="sb-icon">📊</div><div class="sb-label">Analytics</div></div>
+
+  <div class="sb-section">Portals</div>
+  <div class="sb-item" onclick="show('complaints',this)"><div class="sb-icon">🗺️</div><div class="sb-label">Complaints</div><span class="sb-badge-count">24</span></div>
+  <div class="sb-item" onclick="show('jobs',this)"><div class="sb-icon">💼</div><div class="sb-label">Jobs / Rozgar</div><span class="sb-badge-count">8</span></div>
+  <div class="sb-item" onclick="show('ideas',this)"><div class="sb-icon">💡</div><div class="sb-label">Naujawan Ideas</div><span class="sb-badge-count">31</span></div>
+  <div class="sb-item" onclick="show('kisaan',this)"><div class="sb-icon">🌾</div><div class="sb-label">Kisaan Data</div></div>
+
+  <div class="sb-section">Users</div>
+  <div class="sb-item" onclick="show('users',this)"><div class="sb-icon">👥</div><div class="sb-label">All Members</div></div>
+  <div class="sb-item" onclick="show('bots',this)"><div class="sb-icon">🤖</div><div class="sb-label">Bot Flags</div><span class="sb-badge-count">5</span></div>
+
+  <div class="sb-section">AI & Moderation</div>
+  <div class="sb-item" onclick="show('moderation',this)"><div class="sb-icon">🛡️</div><div class="sb-label">Moderation Queue</div><span class="sb-badge-count">12</span></div>
+  <div class="sb-item" onclick="show('ai',this)"><div class="sb-icon">⚙️</div><div class="sb-label">AI Prompt Manager</div></div>
+  <div class="sb-item" onclick="show('costs',this)"><div class="sb-icon">💰</div><div class="sb-label">AI Cost Monitor</div></div>
+
+  <div class="sb-section">Leadership</div>
+  <div class="sb-item" onclick="show('leadership',this)"><div class="sb-icon">👑</div><div class="sb-label">Dr. Waqar Panel</div><span class="sb-badge-green">PRIVATE</span></div>
+
+  <div class="sb-section">System</div>
+  <div class="sb-item" onclick="show('settings',this)"><div class="sb-icon">🔧</div><div class="sb-label">Settings</div></div>
+
+  <div class="sb-user">
+    <div class="sb-av">👤</div>
+    <div><div class="sb-name">Jahanzaib</div><div class="sb-role">IT Lead</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN
+══════════════════════════════════════ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-page" id="page-title">DASHBOARD</div>
+      <div class="tb-sub" id="page-sub">Overview · Live data</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-search"><span style="color:var(--t3);font-size:12px;">🔍</span><input placeholder="Search members, complaints..."/></div>
+      <button class="tb-btn">+ New</button>
+      <div class="tb-notif">🔔<div class="tb-dot"></div></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ── HOME ── -->
+    <div class="screen active" id="screen-home">
+      <div class="stats-row">
+        <div class="stat-card" style="--sc-c:#00FF6A;">
+          <div class="sc-num">48,230</div>
+          <div class="sc-label">Total Members</div>
+          <div class="sc-change sc-up">▲ +1,240 this week</div>
+        </div>
+        <div class="stat-card" style="--sc-c:#F87171;">
+          <div class="sc-num">3,284</div>
+          <div class="sc-label">Complaints</div>
+          <div class="sc-change sc-up">▲ +86 today</div>
+        </div>
+        <div class="stat-card" style="--sc-c:#a78bfa;">
+          <div class="sc-num">1,247</div>
+          <div class="sc-label">Ideas Submitted</div>
+          <div class="sc-change sc-up">▲ +23 today</div>
+        </div>
+        <div class="stat-card" style="--sc-c:#FCD34D;">
+          <div class="sc-num">892</div>
+          <div class="sc-label">Jobs Posted</div>
+          <div class="sc-change sc-dn">▼ 8 flagged scam</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- district map -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">District Activity Map</div>
+            <div class="panel-action">Full Map →</div>
+          </div>
+          <div class="map-ph">
+            <div class="map-grid-bg"></div>
+            <div class="map-pak">🇵🇰</div>
+            <div class="map-pin" style="left:33%;top:52%;"><div class="mp-dot" style="background:#E84040;border-color:#E84040;"></div><div class="mp-lbl">Karachi 847</div></div>
+            <div class="map-pin" style="left:55%;top:28%;"><div class="mp-dot" style="background:#FCD34D;border-color:#FCD34D;"></div><div class="mp-lbl">Lahore 523</div></div>
+            <div class="map-pin" style="left:61%;top:18%;"><div class="mp-dot" style="background:#4DCC74;border-color:#4DCC74;"></div><div class="mp-lbl">ISB 312</div></div>
+            <div class="map-pin" style="left:47%;top:36%;"><div class="mp-dot" style="background:#E84040;border-color:#E84040;"></div><div class="mp-lbl">Multan 244</div></div>
+            <div class="map-pin" style="left:68%;top:12%;"><div class="mp-dot" style="background:#4DCC74;border-color:#4DCC74;"></div><div class="mp-lbl">Pesh. 198</div></div>
+            <div class="map-legend">
+              <div class="ml-item"><div class="ml-dot" style="background:#E84040;"></div>High activity</div>
+              <div class="ml-item"><div class="ml-dot" style="background:#FCD34D;"></div>Medium</div>
+              <div class="ml-item"><div class="ml-dot" style="background:#4DCC74;"></div>Low</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- activity feed -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Live Activity Feed</div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:5px;height:5px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite;"></div><span style="font-size:9px;color:var(--accent);">LIVE</span></div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-icon" style="background:rgba(232,64,64,0.1);border:1px solid rgba(232,64,64,0.2);">🗺️</div>
+            <div class="feed-text"><div class="feed-title">Critical complaint — Karachi Water</div><div class="feed-meta">AI classified CRITICAL · routed to WASA</div></div>
+            <div class="feed-time">2m ago</div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-icon" style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);">💡</div>
+            <div class="feed-text"><div class="feed-title">New idea submitted</div><div class="feed-meta">AI score: 9.2/10 · Pending approval</div></div>
+            <div class="feed-time">5m ago</div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-icon" style="background:rgba(232,64,64,0.1);border:1px solid rgba(232,64,64,0.2);">🤖</div>
+            <div class="feed-text"><div class="feed-title">Bot attack detected</div><div class="feed-meta">50 accounts · same IP · voting one idea</div></div>
+            <div class="feed-time">12m ago</div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-icon" style="background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.2);">💼</div>
+            <div class="feed-text"><div class="feed-title">Job flagged — scam score 0.87</div><div class="feed-meta">AI rejected before going live</div></div>
+            <div class="feed-time">18m ago</div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-icon" style="background:rgba(0,255,106,0.08);border:1px solid rgba(0,255,106,0.15);">👥</div>
+            <div class="feed-text"><div class="feed-title">+48 new members today</div><div class="feed-meta">Punjab 22 · Sindh 14 · KPK 12</div></div>
+            <div class="feed-time">1h ago</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <!-- sentiment -->
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">District Sentiment · AI</div></div>
+          <div class="sent-item"><div class="sent-label">Karachi</div><div class="sent-bar"><div class="sent-fill" style="width:82%;background:#E84040;"></div></div><div class="sent-val" style="color:#F87171;">82%</div></div>
+          <div class="sent-item"><div class="sent-label">Lahore</div><div class="sent-bar"><div class="sent-fill" style="width:61%;background:#FCD34D;"></div></div><div class="sent-val" style="color:#FCD34D;">61%</div></div>
+          <div class="sent-item"><div class="sent-label">Islamabad</div><div class="sent-bar"><div class="sent-fill" style="width:38%;background:#4DCC74;"></div></div><div class="sent-val" style="color:#4DCC74;">38%</div></div>
+          <div class="sent-item"><div class="sent-label">Peshawar</div><div class="sent-bar"><div class="sent-fill" style="width:55%;background:#FCD34D;"></div></div><div class="sent-val" style="color:#FCD34D;">55%</div></div>
+          <div class="sent-item"><div class="sent-label">Quetta</div><div class="sent-bar"><div class="sent-fill" style="width:70%;background:#E84040;"></div></div><div class="sent-val" style="color:#F87171;">70%</div></div>
+          <div style="font-size:8px;color:var(--t3);margin-top:8px;text-align:right;">Higher % = more negative sentiment</div>
+        </div>
+        <!-- weekly chart -->
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Complaints This Week</div></div>
+          <div class="chart-bars">
+            <div class="cb" style="height:30%;"><span class="cb-lbl">Mon</span></div>
+            <div class="cb" style="height:55%;"><span class="cb-lbl">Tue</span></div>
+            <div class="cb" style="height:42%;"><span class="cb-lbl">Wed</span></div>
+            <div class="cb" style="height:78%;background:rgba(0,255,106,0.25);border-color:rgba(0,255,106,0.5);"><span class="cb-lbl">Thu</span></div>
+            <div class="cb" style="height:65%;"><span class="cb-lbl">Fri</span></div>
+            <div class="cb" style="height:88%;background:rgba(232,64,64,0.2);border-color:rgba(232,64,64,0.4);"><span class="cb-lbl">Sat</span></div>
+            <div class="cb" style="height:50%;"><span class="cb-lbl">Sun</span></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:18px;font-size:9px;color:var(--t2);">
+            <span>Peak: Saturday 86 reports</span>
+            <span style="color:var(--accent);">▲ +18% vs last week</span>
+          </div>
+        </div>
+        <!-- pending queue -->
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Pending Review</div></div>
+          <div class="user-row">
+            <div class="feed-icon" style="width:28px;height:28px;background:rgba(232,64,64,0.1);border:1px solid rgba(232,64,64,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">🛡️</div>
+            <div class="u-info"><div class="u-name">Moderation Queue</div><div class="u-meta">12 items flagged by AI</div></div>
+            <span class="b b-r">12</span>
+          </div>
+          <div class="user-row">
+            <div class="feed-icon" style="width:28px;height:28px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">💡</div>
+            <div class="u-info"><div class="u-name">Ideas Approval</div><div class="u-meta">31 pending ideas</div></div>
+            <span class="b b-blue">31</span>
+          </div>
+          <div class="user-row">
+            <div class="feed-icon" style="width:28px;height:28px;background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">💼</div>
+            <div class="u-info"><div class="u-name">Job Postings</div><div class="u-meta">8 awaiting verification</div></div>
+            <span class="b b-y">8</span>
+          </div>
+          <div class="user-row" style="border-bottom:none;">
+            <div class="feed-icon" style="width:28px;height:28px;background:rgba(232,64,64,0.1);border:1px solid rgba(232,64,64,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">🤖</div>
+            <div class="u-info"><div class="u-name">Bot Accounts</div><div class="u-meta">5 flagged accounts</div></div>
+            <span class="b b-r">5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMPLAINTS ── -->
+    <div class="screen" id="screen-complaints">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card" style="--sc-c:#E84040;"><div class="sc-num">24</div><div class="sc-label">Pending Review</div></div>
+        <div class="stat-card" style="--sc-c:#FCD34D;"><div class="sc-num">89</div><div class="sc-label">In Progress</div></div>
+        <div class="stat-card" style="--sc-c:#4DCC74;"><div class="sc-num">127</div><div class="sc-label">Resolved</div></div>
+        <div class="stat-card" style="--sc-c:#00FF6A;"><div class="sc-num">3,284</div><div class="sc-label">Total All Time</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Complaint Queue</div>
+          <div style="display:flex;gap:6px;">
+            <div class="panel-action">Export to Depts →</div>
+            <div class="panel-action">Filter ▼</div>
+          </div>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>Complaint</th><th>Category</th><th>District</th><th>Urgency</th><th>AI Dept</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--t2);">#3284</td>
+              <td><div class="tbl-ur">"5 دن سے پانی نہیں"</div></td>
+              <td><span class="b b-blue">💧 Water</span></td>
+              <td>Karachi</td>
+              <td><span class="b b-r">CRITICAL</span></td>
+              <td style="color:var(--t2);">WASA KHI</td>
+              <td><span class="b b-y">Pending</span></td>
+              <td><div class="act-row"><button class="act act-g">Assign</button><button class="act act-r">Escalate</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:var(--t2);">#3283</td>
+              <td>BHU no doctor for 3 weeks</td>
+              <td><span class="b b-muted">🏥 Hospital</span></td>
+              <td>RYK, Punjab</td>
+              <td><span class="b b-y">HIGH</span></td>
+              <td style="color:var(--t2);">DHO Punjab</td>
+              <td><span class="b b-blue">In Review</span></td>
+              <td><div class="act-row"><button class="act act-g">Resolve</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:var(--t2);">#3282</td>
+              <td>Main road broken after rain</td>
+              <td><span class="b b-muted">🛣️ Roads</span></td>
+              <td>Karachi</td>
+              <td><span class="b b-g">MEDIUM</span></td>
+              <td style="color:var(--t2);">KMC</td>
+              <td><span class="b b-y">Pending</span></td>
+              <td><div class="act-row"><button class="act act-g">Assign</button></div></td>
+            </tr>
+            <tr>
+              <td style="color:var(--t2);">#3281</td>
+              <td><div class="tbl-ur">"3 دن سے بجلی نہیں"</div></td>
+              <td><span class="b b-y">⚡ Electricity</span></td>
+              <td>Lahore</td>
+              <td><span class="b b-y">HIGH</span></td>
+              <td style="color:var(--t2);">LESCO</td>
+              <td><span class="b b-g">Resolved</span></td>
+              <td><div class="act-row"><button class="act act-g">View</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── JOBS ── -->
+    <div class="screen" id="screen-jobs">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card" style="--sc-c:#FCD34D;"><div class="sc-num">8</div><div class="sc-label">Pending Verify</div></div>
+        <div class="stat-card" style="--sc-c:#E84040;"><div class="sc-num">3</div><div class="sc-label">AI Flagged Scam</div></div>
+        <div class="stat-card" style="--sc-c:#4DCC74;"><div class="sc-num">834</div><div class="sc-label">Live Jobs</div></div>
+        <div class="stat-card" style="--sc-c:#a78bfa;"><div class="sc-num">42</div><div class="sc-label">Companies Verified</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">Job Review Queue</div><div class="panel-action">All Jobs →</div></div>
+        <table class="tbl">
+          <thead><tr><th>Company</th><th>Title</th><th>Type</th><th>AI Scam Score</th><th>Flags</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>TechCorp Pvt Ltd</td>
+              <td>React Developer</td>
+              <td><span class="b b-blue">Remote</span></td>
+              <td><div style="display:flex;align-items:center;gap:6px;"><div class="prog" style="width:60px;"><div class="prog-fill" style="width:12%;background:#4DCC74;"></div></div><span style="color:#4DCC74;">0.12</span></div></td>
+              <td style="color:var(--t2);">None</td>
+              <td><div class="act-row"><button class="act act-g">Approve</button><button class="act act-r">Reject</button></div></td>
+            </tr>
+            <tr>
+              <td>EasyMoney Jobs</td>
+              <td>Work from Home — 50K/day</td>
+              <td><span class="b b-muted">Private</span></td>
+              <td><div style="display:flex;align-items:center;gap:6px;"><div class="prog" style="width:60px;"><div class="prog-fill" style="width:87%;background:#E84040;"></div></div><span style="color:#F87171;">0.87</span></div></td>
+              <td style="color:#F87171;">Salary unrealistic · No company details · Requests upfront fee</td>
+              <td><div class="act-row"><button class="act act-r">Reject</button></div></td>
+            </tr>
+            <tr>
+              <td>HEC Pakistan</td>
+              <td>Overseas Scholarship 2025</td>
+              <td><span class="b b-gold">Scholarship</span></td>
+              <td><div style="display:flex;align-items:center;gap:6px;"><div class="prog" style="width:60px;"><div class="prog-fill" style="width:5%;background:#4DCC74;"></div></div><span style="color:#4DCC74;">0.05</span></div></td>
+              <td style="color:var(--t2);">None · Official source</td>
+              <td><div class="act-row"><button class="act act-g">Approve</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── IDEAS ── -->
+    <div class="screen" id="screen-ideas">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card" style="--sc-c:#a78bfa;"><div class="sc-num">31</div><div class="sc-label">Pending Approval</div></div>
+        <div class="stat-card" style="--sc-c:#4DCC74;"><div class="sc-num">892</div><div class="sc-label">Approved Live</div></div>
+        <div class="stat-card" style="--sc-c:#FCD34D;"><div class="sc-num">3</div><div class="sc-label">Featured</div></div>
+        <div class="stat-card" style="--sc-c:#00FF6A;"><div class="sc-num">47K</div><div class="sc-label">Total Votes Cast</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">Ideas Approval Queue</div><div class="panel-action">Export Monthly PDF →</div></div>
+        <table class="tbl">
+          <thead><tr><th>Title</th><th>Category</th><th>Province</th><th>AI Score</th><th>Submitted By</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="max-width:180px;">Open-source corruption tracker with leaderboard</td>
+              <td><span class="b b-muted">Governance</span></td>
+              <td>Punjab</td>
+              <td><span style="color:var(--accent);font-weight:700;">9.2 / 10</span></td>
+              <td style="color:var(--t2);">Jahanzaib K.</td>
+              <td><div class="act-row"><button class="act act-g">Approve</button><button class="act" style="background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.2);color:var(--gold-hi);">Feature</button><button class="act act-r">Reject</button></div></td>
+            </tr>
+            <tr>
+              <td>AI diagnostic tool in all BHUs</td>
+              <td><span class="b b-muted">Health</span></td>
+              <td>KPK</td>
+              <td><span style="color:var(--accent);font-weight:700;">8.7 / 10</span></td>
+              <td style="color:var(--t2);">Dr. Aisha M.</td>
+              <td><div class="act-row"><button class="act act-g">Approve</button><button class="act act-r">Reject</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="tbl-ur">"مفت وائی فائی سرکاری ہسپتالوں میں"</div></td>
+              <td><span class="b b-muted">Health</span></td>
+              <td>Sindh</td>
+              <td><span style="color:#FCD34D;font-weight:700;">7.1 / 10</span></td>
+              <td style="color:var(--t2);">Sana R.</td>
+              <td><div class="act-row"><button class="act act-g">Approve</button><button class="act act-r">Reject</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── USERS ── -->
+    <div class="screen" id="screen-users">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card" style="--sc-c:#00FF6A;"><div class="sc-num">48,230</div><div class="sc-label">Total Members</div></div>
+        <div class="stat-card" style="--sc-c:#4DCC74;"><div class="sc-num">1,240</div><div class="sc-label">Joined This Week</div></div>
+        <div class="stat-card" style="--sc-c:#E84040;"><div class="sc-num">12</div><div class="sc-label">Banned Accounts</div></div>
+        <div class="stat-card" style="--sc-c:#a78bfa;"><div class="sc-num">4</div><div class="sc-label">Moderators</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">All Members</div><div class="panel-action">Export CSV →</div></div>
+        <table class="tbl">
+          <thead><tr><th>Member</th><th>Province</th><th>Joined</th><th>Role</th><th>Activity</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="user-row" style="padding:0;border:none;"><div class="u-av">👤</div><div class="u-info"><div class="u-name">Jahanzaib K.</div><div class="u-meta">+92 300 XXXXXXX</div></div></div></td>
+              <td>Punjab</td>
+              <td style="color:var(--t2);">Jan 2025</td>
+              <td><span class="b b-gold">IT Lead</span></td>
+              <td style="color:var(--t2);">14 reports · 7 ideas</td>
+              <td><span class="b b-g">Active</span></td>
+              <td><div class="act-row"><button class="act act-g">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="user-row" style="padding:0;border:none;"><div class="u-av">👤</div><div class="u-info"><div class="u-name">Sana Rauf</div><div class="u-meta">+92 321 XXXXXXX</div></div></div></td>
+              <td>Sindh</td>
+              <td style="color:var(--t2);">Feb 2025</td>
+              <td><span class="b b-muted">Member</span></td>
+              <td style="color:var(--t2);">2 reports · 3 ideas · 3290 votes</td>
+              <td><span class="b b-g">Active</span></td>
+              <td><div class="act-row"><button class="act act-g">View</button><button class="act act-r">Ban</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="user-row" style="padding:0;border:none;"><div class="u-av">🤖</div><div class="u-info"><div class="u-name">bot_acc_4421</div><div class="u-meta">+92 333 XXXXXXX</div></div></div></td>
+              <td>Unknown</td>
+              <td style="color:var(--t2);">Today</td>
+              <td><span class="b b-muted">Member</span></td>
+              <td style="color:#F87171;">Voted 50x in 2 min</td>
+              <td><span class="b b-r">Flagged</span></td>
+              <td><div class="act-row"><button class="act act-r">Ban</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── MODERATION ── -->
+    <div class="screen" id="screen-moderation">
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card" style="--sc-c:#E84040;"><div class="sc-num">12</div><div class="sc-label">AI Flagged Today</div></div>
+        <div class="stat-card" style="--sc-c:#4DCC74;"><div class="sc-num">284</div><div class="sc-label">Auto-approved</div></div>
+        <div class="stat-card" style="--sc-c:#FCD34D;"><div class="sc-num">3</div><div class="sc-label">Deepfake Checks</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">Content Moderation Queue</div></div>
+        <table class="tbl">
+          <thead><tr><th>Content</th><th>Type</th><th>AI Flag Reason</th><th>Confidence</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="max-width:200px;color:var(--t2);">"[Offensive content redacted]"</td>
+              <td><span class="b b-muted">Comment</span></td>
+              <td style="color:#F87171;">Hate speech · sectarian</td>
+              <td><span style="color:#F87171;font-weight:700;">96%</span></td>
+              <td><div class="act-row"><button class="act act-r">Remove</button><button class="act act-g">Allow</button></div></td>
+            </tr>
+            <tr>
+              <td style="max-width:200px;">Complaint with politician's fake quote</td>
+              <td><span class="b b-muted">Complaint</span></td>
+              <td style="color:#FCD34D;">Possible disinformation</td>
+              <td><span style="color:#FCD34D;font-weight:700;">74%</span></td>
+              <td><div class="act-row"><button class="act act-r">Remove</button><button class="act act-g">Allow</button></div></td>
+            </tr>
+            <tr>
+              <td style="max-width:200px;"><div class="tbl-ur">"مشتبہ ویڈیو — deepfake چیک"</div></td>
+              <td><span class="b b-blue">Video</span></td>
+              <td style="color:#F87171;">AI manipulation detected</td>
+              <td><span style="color:#F87171;font-weight:700;">88%</span></td>
+              <td><div class="act-row"><button class="act act-r">Remove</button><button class="act act-g">Allow</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── AI TOOLS ── -->
+    <div class="screen" id="screen-ai">
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Saathi Chatbot Prompt</div><div class="panel-action">Save Changes</div></div>
+          <div class="prompt-box" contenteditable="true">You are PNP Saathi, the official AI assistant of Pakistan Naujawan Party. Help citizens with jobs, farming, complaints, legal rights. Always reply in the same language the user writes in. Be warm, simple, and concise — max 4-5 sentences.</div>
+          <div style="display:flex;gap:6px;margin-top:10px;">
+            <button class="tb-btn" style="flex:1;">Test Response →</button>
+            <button class="tb-btn" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--t2);">Reset Default</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Complaint Writer Prompt</div><div class="panel-action">Save Changes</div></div>
+          <div class="prompt-box" contenteditable="true">Convert casual citizen complaints into formal Urdu government letters. Include: complaint number, date, specific demand, relevant law reference. Address to the correct department. Keep tone respectful but firm.</div>
+          <div style="display:flex;gap:6px;margin-top:10px;">
+            <button class="tb-btn" style="flex:1;">Test Response →</button>
+            <button class="tb-btn" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--t2);">Reset Default</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Legal AI Prompt</div><div class="panel-action">Save Changes</div></div>
+          <div class="prompt-box" contenteditable="true">Answer Pakistani legal questions in plain Urdu. Reference actual laws (CrPC, PPC, labor laws). Give practical next steps. Never give advice beyond your knowledge — say so honestly.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Crop Disease AI Prompt</div><div class="panel-action">Save Changes</div></div>
+          <div class="prompt-box" contenteditable="true">Analyze crop disease photos. Identify disease name, cause, treatment using locally available solutions in Pakistan. Write in plain Urdu. Always recommend consulting local agricultural officer for serious cases.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AI COSTS ── -->
+    <div class="screen" id="screen-costs">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card" style="--sc-c:#00FF6A;"><div class="sc-num">$48.20</div><div class="sc-label">This Month</div></div>
+        <div class="stat-card" style="--sc-c:#FCD34D;"><div class="sc-num">$3.20</div><div class="sc-label">Today</div></div>
+        <div class="stat-card" style="--sc-c:#4DCC74;"><div class="sc-num">$100</div><div class="sc-label">Monthly Budget</div></div>
+        <div class="stat-card" style="--sc-c:#E84040;"><div class="sc-num">48%</div><div class="sc-label">Budget Used</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">Cost by Portal / Edge Function</div></div>
+        <div class="cost-item"><div class="cost-portal">Saathi Chat</div><div class="cost-bar"><div class="cost-fill" style="width:75%;"></div></div><div class="cost-val">$18.40</div></div>
+        <div class="cost-item"><div class="cost-portal">CV Analyzer</div><div class="cost-bar"><div class="cost-fill" style="width:40%;background:#a78bfa;"></div></div><div class="cost-val">$9.80</div></div>
+        <div class="cost-item"><div class="cost-portal">Complaint Writer</div><div class="cost-bar"><div class="cost-fill" style="width:30%;background:#FCD34D;"></div></div><div class="cost-val">$7.20</div></div>
+        <div class="cost-item"><div class="cost-portal">Legal AI</div><div class="cost-bar"><div class="cost-fill" style="width:22%;background:#38bdf8;"></div></div><div class="cost-val">$5.40</div></div>
+        <div class="cost-item"><div class="cost-portal">Crop Disease</div><div class="cost-bar"><div class="cost-fill" style="width:15%;background:#34d399;"></div></div><div class="cost-val">$3.80</div></div>
+        <div class="cost-item" style="border-bottom:none;"><div class="cost-portal">Moderation</div><div class="cost-bar"><div class="cost-fill" style="width:8%;background:#f472b6;"></div></div><div class="cost-val">$1.80</div></div>
+        <div style="margin-top:12px;padding:10px 12px;background:rgba(0,255,106,0.04);border:1px solid rgba(0,255,106,0.15);border-left:2px solid var(--accent);">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:4px;">Budget Alert Threshold</div>
+          <div style="font-size:11px;color:var(--t2);">Alert Jahanzaib when monthly spend exceeds <span style="color:var(--t1);">$80</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BOT FLAGS ── -->
+    <div class="screen" id="screen-bots">
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">Flagged Bot Accounts</div><div class="panel-action">Ban All →</div></div>
+        <table class="tbl">
+          <thead><tr><th>Account</th><th>Flag Reason</th><th>Evidence</th><th>Created</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>bot_acc_4421</td>
+              <td style="color:#F87171;">Coordinated voting</td>
+              <td style="color:var(--t2);">50 votes in 2 min · same IP as 12 others</td>
+              <td>Today 9:34am</td>
+              <td><div class="act-row"><button class="act act-r">Ban</button><button class="act act-g">Clear</button></div></td>
+            </tr>
+            <tr>
+              <td>user_new_8832</td>
+              <td style="color:#F87171;">Registration pattern</td>
+              <td style="color:var(--t2);">Account 5 of 8 created from same device in 1hr</td>
+              <td>Today 10:12am</td>
+              <td><div class="act-row"><button class="act act-r">Ban</button><button class="act act-g">Clear</button></div></td>
+            </tr>
+            <tr>
+              <td>acc_spam_0012</td>
+              <td style="color:#FCD34D;">Spam complaints</td>
+              <td style="color:var(--t2);">14 identical complaints in 30 min</td>
+              <td>Yesterday</td>
+              <td><div class="act-row"><button class="act act-r">Ban</button><button class="act act-g">Clear</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── KISAAN ── -->
+    <div class="screen" id="screen-kisaan">
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Mandi Prices — Manual Override</div><div class="panel-action">Run Scraper Now →</div></div>
+          <table class="tbl">
+            <thead><tr><th>Crop</th><th>Mandi</th><th>Price (Rs/Maund)</th><th>Last Updated</th><th>Edit</th></tr></thead>
+            <tbody>
+              <tr><td>🌾 Wheat · گندم</td><td>Faisalabad</td><td style="color:var(--accent);">3,800</td><td style="color:var(--t2);">2h ago · Auto</td><td><button class="act act-g">Edit</button></td></tr>
+              <tr><td>🍚 Rice · چاول</td><td>Lahore</td><td style="color:var(--accent);">5,200</td><td style="color:var(--t2);">3h ago · Auto</td><td><button class="act act-g">Edit</button></td></tr>
+              <tr><td>🍬 Sugarcane · گنا</td><td>Multan</td><td style="color:var(--accent);">450</td><td style="color:#FCD34D);">8h ago · Manual</td><td><button class="act act-g">Edit</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Crop Disease Reports by District</div></div>
+          <div class="sent-item"><div class="sent-label">Faisalabad</div><div class="sent-bar"><div class="sent-fill" style="width:68%;background:#E84040;"></div></div><div class="sent-val" style="color:#F87171;">34</div></div>
+          <div class="sent-item"><div class="sent-label">Multan</div><div class="sent-bar"><div class="sent-fill" style="width:44%;background:#FCD34D;"></div></div><div class="sent-val" style="color:#FCD34D;">22</div></div>
+          <div class="sent-item"><div class="sent-label">Sahiwal</div><div class="sent-bar"><div class="sent-fill" style="width:28%;background:#4DCC74;"></div></div><div class="sent-val" style="color:#4DCC74;">14</div></div>
+          <div class="sent-item"><div class="sent-label">Hyderabad</div><div class="sent-bar"><div class="sent-fill" style="width:20%;background:#4DCC74;"></div></div><div class="sent-val" style="color:#4DCC74;">10</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LEADERSHIP ── -->
+    <div class="screen" id="screen-leadership">
+      <div style="background:rgba(200,168,75,0.06);border:1px solid rgba(200,168,75,0.2);border-left:2px solid var(--gold-hi);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:16px;">👑</span>
+        <div><div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-hi);font-weight:700;margin-bottom:2px;">Leadership Access Only</div><div style="font-size:11px;color:var(--t2);">Visible to Dr. Waqar Bin Saif only. IT team cannot access this section.</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Monthly Policy Brief — AI Generated</div><div class="panel-action">Download PDF →</div></div>
+          <div style="padding:10px;background:var(--surface);border:1px solid var(--border);font-size:11px;color:var(--t1);line-height:1.8;margin-bottom:10px;">
+            <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">June 2025 Summary</div>
+            Top issues this month: Water shortage (847 complaints, 60% Karachi), Electricity outages (523, Punjab), Hospital staff absence (312, KPK).<br><br>
+            Top ideas by votes: Corruption tracker (2,744 votes), AI in BHUs (1,891), Free hospital WiFi (3,290 — winner).
+          </div>
+          <button class="tb-btn" style="width:100%;">Generate July Brief →</button>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Opposition Monitor — AI</div><div class="panel-action">Refresh →</div></div>
+          <div class="feed-item">
+            <div class="feed-icon" style="background:rgba(232,64,64,0.1);border:1px solid rgba(232,64,64,0.2);">📰</div>
+            <div class="feed-text"><div class="feed-title">PTI attacked PNP Kisaan Portal</div><div class="feed-meta">Called data "unverified" on Twitter · 2,400 engagements</div></div>
+            <div class="feed-time">3h ago</div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-icon" style="background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.2);">📢</div>
+            <div class="feed-text"><div class="feed-title">PMLN launched competing jobs portal</div><div class="feed-meta">No AI features · limited to Punjab</div></div>
+            <div class="feed-time">1d ago</div>
+          </div>
+          <div class="feed-item" style="border-bottom:none;">
+            <div class="feed-icon" style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);">💬</div>
+            <div class="feed-text"><div class="feed-title">Trending: #PNP_Saathi viral in KPK</div><div class="feed-meta">Positive sentiment · 8,200 mentions this week</div></div>
+            <div class="feed-time">2d ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="screen" id="screen-settings">
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Portal On/Off Switches</div></div>
+          <div class="toggle"><div class="tog-info"><div class="tog-name">PNP Saathi Chatbot</div><div class="tog-desc">Main AI assistant</div></div><div class="tog-sw"></div></div>
+          <div class="toggle"><div class="tog-info"><div class="tog-name">Rozgar Portal</div><div class="tog-desc">Jobs and CV analyzer</div></div><div class="tog-sw"></div></div>
+          <div class="toggle"><div class="tog-info"><div class="tog-name">Problems Portal</div><div class="tog-desc">Complaints and map</div></div><div class="tog-sw"></div></div>
+          <div class="toggle"><div class="tog-info"><div class="tog-name">Naujawan Voice</div><div class="tog-desc">Ideas and voting</div></div><div class="tog-sw"></div></div>
+          <div class="toggle"><div class="tog-info"><div class="tog-name">Kisaan Portal</div><div class="tog-desc">Farmer tools</div></div><div class="tog-sw"></div></div>
+          <div class="toggle"><div class="tog-info"><div class="tog-name">Mahfooz Safety</div><div class="tog-desc">Women's safety network</div></div><div class="tog-sw off"></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Team Access Roles</div><div class="panel-action">+ Add Member</div></div>
+          <table class="tbl">
+            <thead><tr><th>Name</th><th>Role</th><th>Access</th></tr></thead>
+            <tbody>
+              <tr><td>Dr. Waqar Bin Saif</td><td><span class="b b-gold">Super Admin</span></td><td style="color:#4DCC74;">Full + Leadership</td></tr>
+              <tr><td>Jahanzaib</td><td><span class="b b-gold">IT Lead</span></td><td style="color:#4DCC74;">Full (no leadership)</td></tr>
+              <tr><td>Moderator 1</td><td><span class="b b-muted">Moderator</span></td><td style="color:var(--t2);">Moderation + Complaints</td></tr>
+              <tr><td>Analyst 1</td><td><span class="b b-blue">Analyst</span></td><td style="color:var(--t2);">Read-only dashboards</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS ── -->
+    <div class="screen" id="screen-analytics">
+      <div class="stats-row">
+        <div class="stat-card" style="--sc-c:#00FF6A;"><div class="sc-num">48K</div><div class="sc-label">Total Members</div><div class="sc-change sc-up">▲ +18% this month</div></div>
+        <div class="stat-card" style="--sc-c:#a78bfa;"><div class="sc-num">284K</div><div class="sc-label">AI Queries Total</div><div class="sc-change sc-up">▲ +42% this month</div></div>
+        <div class="stat-card" style="--sc-c:#FCD34D;"><div class="sc-num">72%</div><div class="sc-label">Complaint Resolution Rate</div><div class="sc-change sc-up">▲ +8% vs last month</div></div>
+        <div class="stat-card" style="--sc-c:#f472b6;"><div class="sc-num">4.8★</div><div class="sc-label">App Rating (avg)</div></div>
+      </div>
+      <div class="grid-3">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Members by Province</div></div>
+          <div class="sent-item"><div class="sent-label">Punjab</div><div class="sent-bar"><div class="sent-fill" style="width:58%;"></div></div><div class="sent-val" style="color:var(--accent);">58%</div></div>
+          <div class="sent-item"><div class="sent-label">Sindh</div><div class="sent-bar"><div class="sent-fill" style="width:24%;"></div></div><div class="sent-val" style="color:var(--accent);">24%</div></div>
+          <div class="sent-item"><div class="sent-label">KPK</div><div class="sent-bar"><div class="sent-fill" style="width:12%;"></div></div><div class="sent-val" style="color:var(--accent);">12%</div></div>
+          <div class="sent-item"><div class="sent-label">Balochistan</div><div class="sent-bar"><div class="sent-fill" style="width:6%;"></div></div><div class="sent-val" style="color:var(--accent);">6%</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Top Complaint Categories</div></div>
+          <div class="sent-item"><div class="sent-label">💧 Water</div><div class="sent-bar"><div class="sent-fill" style="width:42%;background:#38bdf8;"></div></div><div class="sent-val" style="color:#38bdf8;">42%</div></div>
+          <div class="sent-item"><div class="sent-label">⚡ Electric</div><div class="sent-bar"><div class="sent-fill" style="width:28%;background:#FCD34D;"></div></div><div class="sent-val" style="color:#FCD34D;">28%</div></div>
+          <div class="sent-item"><div class="sent-label">🏥 Health</div><div class="sent-bar"><div class="sent-fill" style="width:16%;background:#f472b6;"></div></div><div class="sent-val" style="color:#f472b6;">16%</div></div>
+          <div class="sent-item"><div class="sent-label">🛣️ Roads</div><div class="sent-bar"><div class="sent-fill" style="width:14%;background:#fb923c;"></div></div><div class="sent-val" style="color:#fb923c;">14%</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Most Used AI Features</div></div>
+          <div class="sent-item"><div class="sent-label">Saathi Chat</div><div class="sent-bar"><div class="sent-fill" style="width:72%;"></div></div><div class="sent-val" style="color:var(--accent);">72%</div></div>
+          <div class="sent-item"><div class="sent-label">Complaint AI</div><div class="sent-bar"><div class="sent-fill" style="width:44%;"></div></div><div class="sent-val" style="color:var(--accent);">44%</div></div>
+          <div class="sent-item"><div class="sent-label">CV Analyzer</div><div class="sent-bar"><div class="sent-fill" style="width:31%;"></div></div><div class="sent-val" style="color:var(--accent);">31%</div></div>
+          <div class="sent-item"><div class="sent-label">Legal AI</div><div class="sent-bar"><div class="sent-fill" style="width:18%;"></div></div><div class="sent-val" style="color:var(--accent);">18%</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<style>
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+
+<script>
+const titles = {
+  home:       ['DASHBOARD',        'Overview · Live data'],
+  analytics:  ['ANALYTICS',        'Platform performance'],
+  complaints: ['COMPLAINTS',       'Review · Assign · Resolve'],
+  jobs:       ['JOBS / ROZGAR',    'Verify · Flag scams'],
+  ideas:      ['NAUJAWAN IDEAS',   'Approve · Feature · Export'],
+  kisaan:     ['KISAAN DATA',      'Mandi prices · Disease map'],
+  users:      ['ALL MEMBERS',      'Search · Filter · Manage'],
+  bots:       ['BOT FLAGS',        'Suspicious accounts'],
+  moderation: ['MODERATION QUEUE', 'AI-flagged content'],
+  ai:         ['AI PROMPT MANAGER','Edit · Test prompts'],
+  costs:      ['AI COST MONITOR',  'Usage · Budget tracking'],
+  leadership: ['LEADERSHIP PANEL', '👑 Dr. Waqar only'],
+  settings:   ['SETTINGS',         'Roles · Portals · Config'],
+};
+
+function show(id, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  el.classList.add('active');
+  const t = titles[id] || [id.toUpperCase(), ''];
+  document.getElementById('page-title').textContent = t[0];
+  document.getElementById('page-sub').textContent = t[1];
+}
+</script>
+</body>
+</html>
