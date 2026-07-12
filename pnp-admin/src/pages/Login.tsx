@@ -45,8 +45,9 @@ export function Login() {
         transition={{ duration: 0.4, ease: 'easeOut' }}
       >
         <div className="login-header">
-          <div className="brand">
-            <span className="mark">PN</span> PNP Admin
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+            <img src="/pnp-logo.png" alt="Pakistan Naujawan Party" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: '20px', fontWeight: 600, color: 'var(--ink)' }}>PNP Admin Portal</div>
           </div>
           <p>Sign in to the Control Room</p>
         </div>

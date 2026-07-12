@@ -45,7 +45,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       <aside className={`side ${open ? 'show' : ''}`}>
         {/* LOGO */}
         <div className="sb-logo">
-          <div className="sb-badge">PNP</div>
+          <img src="/pnp-logo.png" alt="PNP Logo" style={{ width: '42px', height: '42px', objectFit: 'contain', borderRadius: '50%' }} />
           <div className="sb-title">
             <div className="sb-t1">ADMIN</div>
             <div className="sb-t2">Pakistan Naujawan Party</div>
